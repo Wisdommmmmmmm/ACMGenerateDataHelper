@@ -14,7 +14,8 @@
 ***inputsuffix***:生成的输入数据文件后缀  
 ***outputname***:生成的输出数据文件名  
 ***outputsuffix***:生成的输出数据文件后缀  
-***archivename***:压缩后的压缩包名  
+***archivename***:压缩后的压缩包名   
+***endofline***:数据文件行尾符，支持crlf、lf、cr   
 ## 使用环境
 ### 操作系统 
 Windows 10

@@ -20,6 +20,8 @@ outputname = "sample"
 outputsuffix = "out"
 #生成的压缩包名
 archivename = "data"
+#数据文件行尾符号
+endofline = "lf"
 
 def findfile(filename):
     list = os.listdir("./")
@@ -32,7 +34,7 @@ def findfile(filename):
 
 def readconfig():
     if(not findfile("config.ini")):
-        messagebox.showeinfo("提示", "找不到配置文件config.ini，请新建配置文件config.ini，参考网址https://github.com/Wisdommmmmmmm/ACMGenerateDataHelper")
+        messagebox.showinfo("提示", "找不到配置文件config.ini，请新建配置文件config.ini，参考网址https://github.com/Wisdommmmmmmm/ACMGenerateDataHelper")
     global cf
     cf.read("./config.ini")
     global generatename
@@ -49,9 +51,37 @@ def readconfig():
     outputsuffix = cf.get("File", "outputsuffix")
     global archivename
     archivename = cf.get("File", "archivename")
+    global endofline
+    endofline = cf.get("File", "endofline")
     if(outputname+outputsuffix == inputname+inputsuffix):
         messagebox.showerror("错误", "输入和输出文件名称加后缀不能一样")
         os.exit(0)
+
+def changeendofline(filename):
+    global endofline
+    bytes = b''
+    with open(filename, "rb") as f:
+        bytes = f.read()
+    
+    origin = b''
+    if bytes.find(b'\x0D\x0A') != -1:
+        origin = b'\x0D\x0A'
+    elif bytes.find(b'\x0A') != -1:
+        origin = b'\x0A'
+    else:
+        origin = b'\x0D'
+    target = b''
+    if endofline == "crlf":
+        target = b'\x0D\x0A'
+    elif endofline == "lf":
+        target = b'\x0A'
+    else:
+        target = b'\x0D'
+    if origin != target:
+        bytes = bytes.replace(origin, target)
+    
+    with open(filename, "wb") as f:
+        f.write(bytes)
 
 def create(l, r):
     global inputname
@@ -65,6 +95,8 @@ def create(l, r):
         outputfilename = outputname+str(num)+"."+outputsuffix
         subprocess.getoutput(generatename+" 1>"+inputfilename)
         subprocess.getoutput(standardname+" 0<"+inputfilename+" 1>"+outputfilename)
+        changeendofline(inputfilename)
+        changeendofline(outputfilename)
 
 def compress(l, r):
     global archivename
